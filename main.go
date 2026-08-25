@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/beeper/mac-registration-provider/nac"
-	"github.com/beeper/mac-registration-provider/versions"
+	"github.com/lcd1232/mac-registration-provider/nac"
+	"github.com/lcd1232/mac-registration-provider/versions"
 )
 
 type ReqSubmitValidationData struct {

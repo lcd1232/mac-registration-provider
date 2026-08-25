@@ -14,10 +14,10 @@ A future version may work in less hacky ways to support more OS versions.
 
 ## Usage
 1. On your Mac, download the latest `mac-registration-provider` file from the
-   latest [release](https://github.com/beeper/mac-registration-provider/releases)
+   latest [release](https://github.com/lcd1232/mac-registration-provider/releases)
    ![screenshot](https://github.com/beeper/mac-registration-provider/assets/1048265/4a419ae1-8996-4af4-876e-5723db088816)  
    Alternatively, you can download the latest build from GitHub actions
-   ([direct link](https://nightly.link/beeper/mac-registration-provider/workflows/go/main/mac-registration-provider-universal.zip)).
+   ([direct link](https://nightly.link/lcd1232/mac-registration-provider/workflows/go/main/mac-registration-provider-universal.zip)).
 2. Open Terminal app (<kbd>⌘</kbd> + <kbd>space</kbd> -> Terminal), type `cd Downloads`, hit enter
 3. Type `chmod +x mac-registration-provider`, hit enter
 4. Type `./mac-registration-provider`, hit enter

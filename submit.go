@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/beeper/mac-registration-provider/versions"
+	"github.com/lcd1232/mac-registration-provider/versions"
 )
 
 var panicCounter = 0

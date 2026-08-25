@@ -16,7 +16,7 @@ import (
 	"runtime"
 	"unsafe"
 
-	"github.com/beeper/mac-registration-provider/versions"
+	"github.com/lcd1232/mac-registration-provider/versions"
 )
 
 const identityservicesd = "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"

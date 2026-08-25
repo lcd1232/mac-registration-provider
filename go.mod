@@ -1,4 +1,4 @@
-module github.com/beeper/mac-registration-provider
+module github.com/lcd1232/mac-registration-provider
 
 go 1.21
 
