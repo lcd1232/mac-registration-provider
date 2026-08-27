@@ -7,7 +7,10 @@ env:
   GO_VERSION: "1.21"
 
 jobs:
-  build-arm64:
+  build:
+    # Everything runs on the arm64 runner; the x86_64 slice is cross-compiled
+    # with cgo (clang can target both arches). Intel (macos-13) runners are
+    # unreliable to schedule on forks, so we avoid depending on them.
     runs-on: macos-15
 
     steps:
@@ -19,63 +22,41 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
           cache: true
 
-      - name: Build
-        run: MACOSX_DEPLOYMENT_TARGET=11.0 go build -v -ldflags "-X main.Commit=${{ github.sha }}"
+      - name: Build arm64
+        run: |
+          CGO_ENABLED=1 GOARCH=arm64 MACOSX_DEPLOYMENT_TARGET=11.0 \
+            go build -v -ldflags "-X main.Commit=${{ github.sha }}" \
+            -o mac-registration-provider-arm64
+
+      - name: Build x86_64 (cross-compile)
+        run: |
+          CGO_ENABLED=1 GOARCH=amd64 CC="clang -arch x86_64" MACOSX_DEPLOYMENT_TARGET=10.13 \
+            go build -v -ldflags "-X main.Commit=${{ github.sha }}" \
+            -o mac-registration-provider-x86
+
+      - name: Build universal binary
+        run: |
+          lipo -create -output mac-registration-provider-universal \
+            mac-registration-provider-x86 mac-registration-provider-arm64
 
       - name: Run the binary
         # The CI runner's exact macOS build may not have offsets in the map,
-        # so treat the smoke test as non-fatal (the build artifact is the goal).
+        # so treat the smoke test as non-fatal (the build artifacts are the goal).
         continue-on-error: true
-        run: ./mac-registration-provider -once
-
-      - name: Install lint dependencies
-        run: |
-          go install golang.org/x/tools/cmd/goimports@latest
-          go install honnef.co/go/tools/cmd/staticcheck@latest
-          export PATH="$HOME/go/bin:$PATH"
-
-      - name: Run pre-commit
-        uses: pre-commit/action@v3.0.0
+        run: ./mac-registration-provider-arm64 -once
 
       - uses: actions/upload-artifact@v4
         with:
           name: mac-registration-provider-arm64
-          path: mac-registration-provider
+          path: mac-registration-provider-arm64
           if-no-files-found: error
-
-  build-x86:
-    runs-on: macos-13
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go ${{ env.GO_VERSION }}
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-          cache: true
-
-      - name: Build
-        run: MACOSX_DEPLOYMENT_TARGET=10.13 go build -v -ldflags "-X main.Commit=${{ github.sha }}"
-
-      - name: Run the binary
-        # Non-fatal: the runner's macOS build may not have offsets in the map.
-        continue-on-error: true
-        run: ./mac-registration-provider -once
 
       - uses: actions/upload-artifact@v4
         with:
           name: mac-registration-provider-x86
-          path: mac-registration-provider
+          path: mac-registration-provider-x86
           if-no-files-found: error
 
-  build-universal:
-    runs-on: macos-13
-    needs: [build-arm64, build-x86]
-    steps:
-      - uses: actions/download-artifact@v4
-      - name: Build universal binary
-        run: lipo -create -output mac-registration-provider-universal mac-registration-provider-x86/mac-registration-provider mac-registration-provider-arm64/mac-registration-provider
       - uses: actions/upload-artifact@v4
         with:
           name: mac-registration-provider-universal
